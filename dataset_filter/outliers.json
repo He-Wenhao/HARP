@@ -1,0 +1,233 @@
+{
+  "threshold_z": 10.0,
+  "n_total": 41948,
+  "per_property": {
+    "E": {
+      "n": 41948,
+      "median_err2": 4.0362699766922386e-08,
+      "sigma_log": 0.813410463229243,
+      "n_outliers": 0,
+      "top_outliers": []
+    },
+    "E_gap": {
+      "n": 41948,
+      "median_err2": 4.5474737230793916e-07,
+      "sigma_log": 0.8306410260963814,
+      "n_outliers": 0,
+      "top_outliers": []
+    },
+    "dipole": {
+      "n": 41948,
+      "median_err2": 1.3364585536904442e-06,
+      "sigma_log": 0.4294470174203102,
+      "n_outliers": 1,
+      "top_outliers": [
+        {
+          "mol": "1371",
+          "datagroup": "P_S_Cl_dataset_v3/P_S_Cl_data_1001_2000",
+          "err2": 0.033917141409565886,
+          "z": 10.256128389515913
+        }
+      ]
+    },
+    "quadrupole": {
+      "n": 41948,
+      "median_err2": 1.5817568875347685e-05,
+      "sigma_log": 0.30903650950006945,
+      "n_outliers": 6,
+      "top_outliers": [
+        {
+          "mol": "772",
+          "datagroup": "P_S_Cl_dataset_v3/P_S_Cl_data_1_1000",
+          "err2": 0.04251575854741915,
+          "z": 11.097103715387734
+        },
+        {
+          "mol": "325",
+          "datagroup": "P_S_Cl_dataset_v3/P_S_Cl_data_1_1000",
+          "err2": 0.06539916050550597,
+          "z": 11.702282184045911
+        },
+        {
+          "mol": "889",
+          "datagroup": "P_S_Cl_dataset_v3/P_S_Cl_data_1_1000",
+          "err2": 0.38233313030008587,
+          "z": 14.183768142596504
+        },
+        {
+          "mol": "1371",
+          "datagroup": "P_S_Cl_dataset_v3/P_S_Cl_data_1001_2000",
+          "err2": 0.4385348405803293,
+          "z": 14.376503202631127
+        },
+        {
+          "mol": "1429",
+          "datagroup": "P_S_Cl_dataset_v3/P_S_Cl_data_1001_2000",
+          "err2": 0.02494268329868733,
+          "z": 10.347655826840633
+        },
+        {
+          "mol": "1271",
+          "datagroup": "P_S_Cl_dataset_v3/P_S_Cl_data_1001_2000",
+          "err2": 0.031110691444968405,
+          "z": 10.658190304660172
+        }
+      ]
+    },
+    "atomic_charge": {
+      "n": 41948,
+      "median_err2": 38.590217752197105,
+      "sigma_log": 0.12117819362779927,
+      "n_outliers": 0,
+      "top_outliers": []
+    },
+    "alpha": {
+      "n": 41948,
+      "median_err2": 0.009687948508032306,
+      "sigma_log": 0.41850013453808127,
+      "n_outliers": 4,
+      "top_outliers": [
+        {
+          "mol": "889",
+          "datagroup": "P_S_Cl_dataset_v3/P_S_Cl_data_1_1000",
+          "err2": 694.7398892036579,
+          "z": 11.602362848868209
+        },
+        {
+          "mol": "11685",
+          "datagroup": "P_S_Cl_dataset_v3/P_S_Cl_data_7001_12000",
+          "err2": 1628.7370180945659,
+          "z": 12.48654113600284
+        },
+        {
+          "mol": "14498",
+          "datagroup": "P_S_Cl_dataset_v3/P_S_Cl_data_12001_17000",
+          "err2": 68872.99445818973,
+          "z": 16.37231766092415
+        },
+        {
+          "mol": "36339",
+          "datagroup": "P_S_Cl_dataset_v3/P_S_Cl_data_29001_44412",
+          "err2": 10518.856397521056,
+          "z": 14.422305290345424
+        }
+      ]
+    },
+    "bond_order": {
+      "n": 41948,
+      "median_err2": 3.113491891582892e-05,
+      "sigma_log": 0.34329218432530706,
+      "n_outliers": 0,
+      "top_outliers": []
+    }
+  },
+  "union": [
+    {
+      "datagroup": "P_S_Cl_dataset_v3/P_S_Cl_data_1001_2000",
+      "mol": "1371",
+      "flagged": {
+        "dipole": {
+          "err2": 0.033917141409565886,
+          "z": 10.256128389515913
+        },
+        "quadrupole": {
+          "err2": 0.4385348405803293,
+          "z": 14.376503202631127
+        }
+      },
+      "max_z": 14.376503202631127
+    },
+    {
+      "datagroup": "P_S_Cl_dataset_v3/P_S_Cl_data_1_1000",
+      "mol": "772",
+      "flagged": {
+        "quadrupole": {
+          "err2": 0.04251575854741915,
+          "z": 11.097103715387734
+        }
+      },
+      "max_z": 11.097103715387734
+    },
+    {
+      "datagroup": "P_S_Cl_dataset_v3/P_S_Cl_data_1_1000",
+      "mol": "325",
+      "flagged": {
+        "quadrupole": {
+          "err2": 0.06539916050550597,
+          "z": 11.702282184045911
+        }
+      },
+      "max_z": 11.702282184045911
+    },
+    {
+      "datagroup": "P_S_Cl_dataset_v3/P_S_Cl_data_1_1000",
+      "mol": "889",
+      "flagged": {
+        "quadrupole": {
+          "err2": 0.38233313030008587,
+          "z": 14.183768142596504
+        },
+        "alpha": {
+          "err2": 694.7398892036579,
+          "z": 11.602362848868209
+        }
+      },
+      "max_z": 14.183768142596504
+    },
+    {
+      "datagroup": "P_S_Cl_dataset_v3/P_S_Cl_data_1001_2000",
+      "mol": "1429",
+      "flagged": {
+        "quadrupole": {
+          "err2": 0.02494268329868733,
+          "z": 10.347655826840633
+        }
+      },
+      "max_z": 10.347655826840633
+    },
+    {
+      "datagroup": "P_S_Cl_dataset_v3/P_S_Cl_data_1001_2000",
+      "mol": "1271",
+      "flagged": {
+        "quadrupole": {
+          "err2": 0.031110691444968405,
+          "z": 10.658190304660172
+        }
+      },
+      "max_z": 10.658190304660172
+    },
+    {
+      "datagroup": "P_S_Cl_dataset_v3/P_S_Cl_data_7001_12000",
+      "mol": "11685",
+      "flagged": {
+        "alpha": {
+          "err2": 1628.7370180945659,
+          "z": 12.48654113600284
+        }
+      },
+      "max_z": 12.48654113600284
+    },
+    {
+      "datagroup": "P_S_Cl_dataset_v3/P_S_Cl_data_12001_17000",
+      "mol": "14498",
+      "flagged": {
+        "alpha": {
+          "err2": 68872.99445818973,
+          "z": 16.37231766092415
+        }
+      },
+      "max_z": 16.37231766092415
+    },
+    {
+      "datagroup": "P_S_Cl_dataset_v3/P_S_Cl_data_29001_44412",
+      "mol": "36339",
+      "flagged": {
+        "alpha": {
+          "err2": 10518.856397521056,
+          "z": 14.422305290345424
+        }
+      },
+      "max_z": 14.422305290345424
+    }
+  ]
+}

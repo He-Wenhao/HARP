@@ -1,0 +1,10 @@
+! RHF EOM-CCSD cc-pVDZ TightSCF
+%maxcore 2500
+%pal
+nprocs 7
+end
+! LargePrint KeepDens
+%MDCI
+nroots 3
+END
+* xyzfile 0 1 molecule.xyz

@@ -1,0 +1,13 @@
+! RHF bt-PNO-IP-EOM-CCSD cc-pVDZ def2/J cc-pVDZ/C TightSCF
+%mdci
+nroots 2
+end
+%maxcore 2500
+%pal
+nprocs 7
+end
+%scf
+AutoTRAH false
+maxiter 1000
+end
+* xyzfile 0 1 molecule.xyz

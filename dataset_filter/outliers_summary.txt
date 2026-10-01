@@ -1,0 +1,61 @@
+Total molecules: 41948
+Z threshold (log10 err): 10.0
+
+Per-property tail:
+property               N    median(err²)   sigma_log   #outliers
+----------------------------------------------------------------
+E                  41948      4.0363e-08       0.813           0
+E_gap              41948      4.5475e-07       0.831           0
+dipole             41948      1.3365e-06       0.429           1
+quadrupole         41948      1.5818e-05       0.309           6
+atomic_charge      41948      3.8590e+01       0.121           0
+alpha              41948      9.6879e-03       0.419           4
+bond_order         41948      3.1135e-05       0.343           0
+
+Union (any property flagged): 9 molecules
+
+
+=== Top 15 outliers for E ===
+mol_id    datagroup                                                 err²       z
+
+=== Top 15 outliers for E_gap ===
+mol_id    datagroup                                                 err²       z
+
+=== Top 15 outliers for dipole ===
+mol_id    datagroup                                                 err²       z
+1371      P_S_Cl_dataset_v3/P_S_Cl_data_1001_2000             3.3917e-02   10.26
+
+=== Top 15 outliers for quadrupole ===
+mol_id    datagroup                                                 err²       z
+1371      P_S_Cl_dataset_v3/P_S_Cl_data_1001_2000             4.3853e-01   14.38
+889       P_S_Cl_dataset_v3/P_S_Cl_data_1_1000                3.8233e-01   14.18
+325       P_S_Cl_dataset_v3/P_S_Cl_data_1_1000                6.5399e-02   11.70
+772       P_S_Cl_dataset_v3/P_S_Cl_data_1_1000                4.2516e-02   11.10
+1271      P_S_Cl_dataset_v3/P_S_Cl_data_1001_2000             3.1111e-02   10.66
+1429      P_S_Cl_dataset_v3/P_S_Cl_data_1001_2000             2.4943e-02   10.35
+
+=== Top 15 outliers for atomic_charge ===
+mol_id    datagroup                                                 err²       z
+
+=== Top 15 outliers for alpha ===
+mol_id    datagroup                                                 err²       z
+14498     P_S_Cl_dataset_v3/P_S_Cl_data_12001_17000           6.8873e+04   16.37
+36339     P_S_Cl_dataset_v3/P_S_Cl_data_29001_44412           1.0519e+04   14.42
+11685     P_S_Cl_dataset_v3/P_S_Cl_data_7001_12000            1.6287e+03   12.49
+889       P_S_Cl_dataset_v3/P_S_Cl_data_1_1000                6.9474e+02   11.60
+
+=== Top 15 outliers for bond_order ===
+mol_id    datagroup                                                 err²       z
+
+
+=== UNION OUTLIERS (any property z > threshold) ===
+mol_id    datagroup                                       flagged_props                                                  max_z
+14498     P_S_Cl_dataset_v3/P_S_Cl_data_12001_17000       alpha(16.4)                                                    16.37
+36339     P_S_Cl_dataset_v3/P_S_Cl_data_29001_44412       alpha(14.4)                                                    14.42
+1371      P_S_Cl_dataset_v3/P_S_Cl_data_1001_2000         dipole(10.3),quadrupole(14.4)                                  14.38
+889       P_S_Cl_dataset_v3/P_S_Cl_data_1_1000            quadrupole(14.2),alpha(11.6)                                   14.18
+11685     P_S_Cl_dataset_v3/P_S_Cl_data_7001_12000        alpha(12.5)                                                    12.49
+325       P_S_Cl_dataset_v3/P_S_Cl_data_1_1000            quadrupole(11.7)                                               11.70
+772       P_S_Cl_dataset_v3/P_S_Cl_data_1_1000            quadrupole(11.1)                                               11.10
+1271      P_S_Cl_dataset_v3/P_S_Cl_data_1001_2000         quadrupole(10.7)                                               10.66
+1429      P_S_Cl_dataset_v3/P_S_Cl_data_1001_2000         quadrupole(10.3)                                               10.35

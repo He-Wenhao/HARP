@@ -1,0 +1,21 @@
+! DLPNO-CCSD(T) cc-pVDZ cc-pVDZ/C RIJCOSX def2/J TIGHTSCF
+%maxcore 2500
+%pal
+nprocs 7
+end
+! LargePrint KeepDens
+%MDCI
+ENFORCE_CCSD_DENSITY true
+maxiter 200
+Density unrelaxed
+END
+%ELPROP
+Origin CenterOfNucCharge
+dipole true
+quadrupole true
+END
+% OUTPUT
+Print[ P_Density ] 1        # converged density
+Print[ P_KinEn ] 1          # kinetic energy matrix
+END
+* xyzfile 0 1 molecule.xyz

@@ -1,0 +1,20 @@
+! BP86 def2-SVP
+%maxcore 2500
+%pal
+nprocs 7
+end
+%scf
+AutoTRAH false
+maxiter 1000
+end
+%ELPROP
+Origin CenterOfNucCharge
+dipole true
+quadrupole true
+Polar true
+END
+% OUTPUT
+Print[ P_Overlap ] 1        # converged density
+Print[ P_Iter_F ] 1         # kinetic energy matrix
+END
+* xyzfile 0 1 molecule.xyz
