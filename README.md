@@ -37,7 +37,8 @@ MEHnet-MG in arXiv v1 of the paper.
 | `models/HARP/` | released configuration, `test.py` (evaluation), `run_ham_chain.py` (arbitrary geometries), training launchers |
 | `orca_templates/` | the ORCA 6.0 inputs used to generate every reference label and DFT baseline (see below) |
 | `dataset_filter/` | model-in-the-loop outlier screen used to clean the dataset, and the list of removed molecules |
-| `scripts/` | test-input builder (`build_basic_b3lyp.py`), accuracy tables versus DFT, SI statistics, GPU inference timing |
+| `scripts/` | test-input builder (`build_basic_b3lyp.py`), Table 1 (`table1.py`), accuracy tables versus DFT, SI statistics, GPU inference timing |
+| `data/` | `table1_dft_recompute.tar.gz`: the DFT comparator data behind Table 1 (also on Zenodo) |
 | `examples/oligothiophene/` | geometry builder for the out-of-distribution oligothiophene test |
 
 ## Installation
@@ -81,7 +82,7 @@ curl -L -o models/HARP/output/model/1265_model.pt \
 ## Evaluate on the test set
 
 1. Download the test-set inputs from Zenodo
-   ([10.5281/zenodo.22006187](https://doi.org/10.5281/zenodo.22006187)) and
+   ([10.5281/zenodo.22006186](https://doi.org/10.5281/zenodo.22006186), all versions) and
    unpack them into the test group directory:
 
    ```bash
@@ -93,9 +94,10 @@ curl -L -o models/HARP/output/model/1265_model.pt \
    ```
 
    This gives `basic/` (BP86/def2-SVP Fock, overlap and polarizability),
-   `obs/` (coupled-cluster labels) and `obs_B3LYP/`, `obs_bp86/`,
-   `obs_DSD_PBEP86/` (DFT baselines and comparators) for the 959 test
-   molecules.
+   `obs/` (coupled-cluster labels), `obs_B3LYP/` and `obs_bp86/`
+   (def2-SVP Δ-learning baselines) and `obs_DSD_PBEP86/` (def2-TZVP) for the
+   959 test molecules. The Table 1 DFT comparators are a separate recompute;
+   see "Reproduce Table 1" below.
 2. Build the B3LYP model inputs:
 
    ```bash
@@ -119,22 +121,57 @@ curl -L -o models/HARP/output/model/1265_model.pt \
 
    ```bash
    python models/HARP/test.py                      # -> models/HARP/output/test/test.json
-   python scripts/compare_methods.py --model-dir models/HARP   # MAE/RMSE vs BP86, B3LYP, DSD-PBEP86
-   python scripts/si_tables.py --model-dir models/HARP         # error distributions, tensor channels, per element
+   python scripts/table1.py --model-dir models/HARP            # Table 1 (see below)
+   python scripts/si_tables.py --model-dir models/HARP         # SI accuracy tables
+   python scripts/compare_methods.py --model-dir models/HARP   # MAE/RMSE vs the def2-SVP/def2-TZVP baselines
    ```
 
 `test.json` holds `pred` and `label` lists for each property over the test
 molecules, and `file_names` gives the molecule order. The config uses
 `device = cuda:0`. For CPU, set `[general] device = cpu`, which is much slower.
 
-The DFT columns of `compare_methods.py` use the observables shipped with the
-test set: BP86 and B3LYP at def2-SVP, DSD-PBEP86 at def2-TZVP. They are
-larger than the DFT columns of Table 1, where each functional was recomputed
-at the basis of the property's coupled-cluster reference (cc-pVTZ for energy,
-multipoles, charges and bond orders; cc-pVDZ for polarizability and gap).
-The model column is unaffected. `compare_methods.py` reports dipole and
-quadrupole errors per Cartesian component in a.u., whereas Table 1 reports
-|μ| in Debye and ‖Q‖.
+### Reproduce Table 1
+
+`scripts/table1.py` prints Table 1 and compares every cell with the printed
+value. The HARP column comes from `test.json`. The DFT columns come from
+`data/table1_dft_recompute.tar.gz` (also on Zenodo), in which each functional
+was recomputed at the basis of the property's coupled-cluster reference:
+cc-pVTZ for the energy (compared as an atomization energy, with cc-pVTZ
+single-atom energies), dipole, quadrupole, charges and bond orders; cc-pVDZ
+for the polarizability and the optical gap. The inputs are
+`orca_templates/table1_*.inp`. Dipole errors are the norm of the error vector
+in Debye and quadrupole errors the Frobenius norm of the error tensor, as in
+the paper.
+
+The printed DFT columns were aggregated over 962 molecules: the 959 test
+molecules plus three molecules (325, 772, 889) that the outlier screen
+removed from the test set (`dataset_filter/outliers_summary.txt`). The HARP
+column is over the 959 test molecules. The data package includes the
+coupled-cluster labels and geometries of the three molecules.
+
+```bash
+python scripts/table1.py --model-dir models/HARP              # --set paper (default): 962 for DFT, as printed
+python scripts/table1.py --model-dir models/HARP --set test   # all columns over the 959 test molecules
+```
+
+| property | BP86 | B3LYP | DSD-PBEP86 | HARP |
+|---|---|---|---|---|
+| E (kcal/mol) | 63.0 (62.9) | 13.2 | 15.1 | 0.23 |
+| E_gap (eV) | 1.32 | 0.61 | 4.84 | 0.067 |
+| \|μ\| (Debye) | 0.160 (0.157) | 0.159 (0.158) | 0.109 | 0.022 |
+| ‖Q‖ (a.u.) | 0.389 (0.385) | 0.347 (0.342) | 0.233 (0.230) | 0.044 |
+| α_iso (a.u.) | 4.71 (4.68) | 2.79 (2.76) | 1.18 | 0.121 |
+| q (e) | 0.0205 | 0.0256 | 0.0220 | 0.0053 |
+| bond order | 0.0556 (0.0555) | 0.0588 | 0.0251 | 0.0066 |
+
+Printed values; in parentheses the 959-molecule value where it differs at the
+printed precision.
+
+`compare_methods.py` compares against the DFT observables shipped with the
+test set instead (BP86 and B3LYP at def2-SVP, DSD-PBEP86 at def2-TZVP), with
+per-component dipole and quadrupole errors in a.u. Its DFT columns are
+therefore larger than in Table 1; its model column agrees with Table 1 for
+E, E_gap, α_iso, q and bond order.
 
 ## Inference on new geometries
 
@@ -159,7 +196,8 @@ total cost.
 
 `orca_templates/` holds the ORCA inputs used for the dataset, extracted from the
 production runs (identical for every molecule). Only the geometry file name
-was replaced by `molecule.xyz`.
+was replaced by `molecule.xyz`. The dataset labels and baselines were computed
+with ORCA 6.0, the Table 1 DFT comparators with ORCA 6.1.1.
 
 | label | template |
 |---|---|
@@ -168,7 +206,10 @@ was replaced by `molecule.xyz`.
 | optical gap | `optical_gap_EOM-CCSD_cc-pVDZ.inp` (lowest of 3 roots) |
 | IP / EA | `ionization_*.inp`, `electron_affinity_*.inp` |
 | Δ-learning baselines | `baseline_B3LYP_def2-SVP.inp` (released model), `baseline_BP86_def2-SVP.inp` (ablation) |
-| DFT comparator | `comparator_DSD-PBEP86.inp` |
+| DSD-PBEP86/def2-TZVP observables (`obs_DSD_PBEP86/` in the test-set archive) | `comparator_DSD-PBEP86.inp` |
+| Table 1 DFT comparators, cc-pVTZ (E, μ, Q, q, bond order) | `table1_BP86_cc-pVTZ.inp`, `table1_B3LYP_cc-pVTZ.inp`, `table1_DSD-PBEP86_cc-pVTZ_relaxed.inp` (MP2-relaxed density) |
+| Table 1 DFT comparators, cc-pVDZ (α, gap) | `table1_{BP86,B3LYP,DSD-PBEP86}_cc-pVDZ_polar.inp` |
+| Table 1 atomization-energy reference | `table1_single-atom_{BP86,B3LYP,DSD-PBEP86}_cc-pVTZ.inp` |
 
 The `%pal nprocs` and `%maxcore` settings are those of the production
 runs; adjust them to your machine.

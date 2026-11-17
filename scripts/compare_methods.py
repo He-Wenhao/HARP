@@ -10,6 +10,11 @@ listed datagroup the script expects the standard sub-folders:
   obs_bp86/     BP86 reference labels   (named <idx>.json)  [optional]
   obs_DSD_PBEP86/ DSD-PBEP86 reference labels (named <idx>.json) [optional]
 
+The DFT folders above are the def2-SVP (BP86, B3LYP) and def2-TZVP
+(DSD-PBEP86) observables of the test-set archive, so the DFT columns here are
+not those of the paper's Table 1; scripts/table1.py reproduces Table 1 from
+the property-matched-basis recompute.
+
 Each method's per-property MAE/RMSE is aggregated across all 959 (or N) test
 molecules, with bond-order errors masked to truth-listed bonded pairs only
 (zero-fill on non-bonded entries gives DFT methods an unfair advantage).

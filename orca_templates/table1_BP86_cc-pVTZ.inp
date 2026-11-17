@@ -1,0 +1,15 @@
+! BP86 cc-pVTZ TightSCF
+%maxcore 4000
+%pal
+nprocs 1
+end
+%scf
+AutoTRAH false
+maxiter 1000
+end
+%ELPROP
+Origin CenterOfNucCharge
+dipole true
+quadrupole true
+END
+* xyzfile 0 1 molecule.xyz
