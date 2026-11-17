@@ -140,6 +140,8 @@ if __name__ == "__main__":
         test_datagroups, 0, 1,
         delta_learning=delta_learning, delta_baseline=delta_baseline,
         load_obs=(head_type == 'hamiltonian'))
+    if delta_learning:
+        loader.check_basic_matches_baseline(data, fl, delta_baseline)
     my_sampler = sampler(data, labels_all, device)
 
     n_molecules = len(my_sampler)

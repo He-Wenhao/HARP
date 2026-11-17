@@ -348,6 +348,47 @@ class dataloader():
                             for k, v in baseline_obs.items()}
         return baseline_obs
 
+    def check_basic_matches_baseline(self, data_in, fl, baseline, n_check=10):
+        """Fail loudly if the model inputs do not come from the `baseline` functional.
+
+        A B3LYP-baseline model must read `basic_B3LYP/` (built by
+        scripts/build_basic_b3lyp.py). Feeding it the BP86 `basic/` (or a stale
+        preprocessing cache built from it) runs without error but corrupts
+        every Hamiltonian-derived property. The basic-file polarizability is
+        copied verbatim from obs_<baseline>/, so comparing the two (as loaded
+        from the cache) detects both mistakes.
+        """
+        baseline = _normalize_baseline(baseline)
+        if baseline == 'none':
+            return
+        obs_dir = BASELINE_DIRS[baseline]
+        n_checked = 0
+        for d, file in zip(data_in, fl):
+            if n_checked >= n_check:
+                break
+            json_path = os.path.join(self._group_dir(file), obs_dir,
+                                     file[1].split('_')[0] + '.json')
+            if not os.path.exists(json_path):
+                continue
+            with open(json_path) as f:
+                ref = np.asarray(json.load(f)['alpha'], dtype=float)
+            got = d['alpha_bp86'].detach().cpu().numpy().astype(float)
+            if ref.shape != got.shape or not np.allclose(got, ref, rtol=1e-5, atol=1e-4):
+                raise RuntimeError(
+                    f"Model inputs do not match the '{baseline}' baseline: the "
+                    f"polarizability in {file[0]}{file[1]} (as loaded from "
+                    f"'{self.tmp_subdir}/') differs from {json_path}.\n"
+                    f"  - basic_subdir is '{self.basic_subdir}'. The Zenodo "
+                    f"'basic/' folder is BP86; for the released B3LYP model, "
+                    f"build 'basic_B3LYP/' with scripts/build_basic_b3lyp.py "
+                    f"(do not symlink 'basic' to it).\n"
+                    f"  - If 'basic_B3LYP/' is correct, delete the stale cache "
+                    f"'{self.tmp_subdir}/' and rerun.")
+            n_checked += 1
+        if n_checked == 0:
+            print(f"[loader] warning: no {obs_dir}/ files found to verify the "
+                  f"'{baseline}' model inputs")
+
     def load_data(self, group, rank, world_size, delta_learning=True,
                   delta_baseline='b3lyp', max_items=None, load_obs=True):
         """Load preprocessed molecule records.

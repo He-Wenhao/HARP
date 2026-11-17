@@ -37,7 +37,7 @@ MEHnet-MG in arXiv v1 of the paper.
 | `models/HARP/` | released configuration, `test.py` (evaluation), `run_ham_chain.py` (arbitrary geometries), training launchers |
 | `orca_templates/` | the ORCA 6.0 inputs used to generate every reference label and DFT baseline (see below) |
 | `dataset_filter/` | model-in-the-loop outlier screen used to clean the dataset, and the list of removed molecules |
-| `scripts/` | accuracy tables versus DFT, SI statistics, GPU inference timing |
+| `scripts/` | test-input builder (`build_basic_b3lyp.py`), accuracy tables versus DFT, SI statistics, GPU inference timing |
 | `examples/oligothiophene/` | geometry builder for the out-of-distribution oligothiophene test |
 
 ## Installation
@@ -45,12 +45,18 @@ MEHnet-MG in arXiv v1 of the paper.
 You need Python ≥ 3.9 and PyTorch ≥ 2.x. Then install the dependencies:
 
 ```bash
-pip install e3nn numpy scipy sympy tqdm pyscf torch_cluster
+pip install e3nn numpy scipy sympy tqdm pyscf periodictable matplotlib \
+    "torch_geometric<2.8" torch_scatter torch_cluster huggingface_hub pydantic
+pip install "fairchem-core==1.10.0" --no-deps   # eSEN/EquiformerV2 backbone
 ```
 
-The `torch_cluster` wheel must match your torch/CUDA build; see
-[pytorch_cluster](https://github.com/rusty1s/pytorch_cluster). You do not
-need to install this repo: the entry scripts add `src/` to the import path.
+The `torch_scatter` and `torch_cluster` wheels must match your torch/CUDA
+build; see [pytorch_cluster](https://github.com/rusty1s/pytorch_cluster).
+`fairchem-core` is installed without its dependencies; `huggingface_hub` and
+`pydantic` are the ones it needs here. `torch_geometric` 2.6.1 and 2.7.0 are
+tested; 2.8 routes `radius_graph` through `pyg-lib>=0.6`, which older torch
+builds lack. You do not need to install this repo: the entry scripts add
+`src/` to the import path.
 On NERSC Perlmutter, `module load pytorch/2.6.0-1 && source ./env.sh` is
 enough.
 
@@ -74,12 +80,42 @@ curl -L -o models/HARP/output/model/1265_model.pt \
 
 ## Evaluate on the test set
 
-1. Place the 959-molecule test set under
-   `dataset/P_S_Cl_dataset_v3/P_S_Cl_data_1_1000/`. The test set contains the
-   structures and every coupled-cluster label. It will be archived on Zenodo
-   upon publication; until then it is available from the corresponding
-   author.
-2. Run:
+1. Download the test-set inputs from Zenodo
+   ([10.5281/zenodo.22006187](https://doi.org/10.5281/zenodo.22006187)) and
+   unpack them into the test group directory:
+
+   ```bash
+   G=dataset/P_S_Cl_dataset_v3/P_S_Cl_data_1_1000
+   mkdir -p $G
+   curl -L -o main-group-cc_test-set-full-inputs.tar.gz \
+     https://zenodo.org/records/22006187/files/main-group-cc_test-set-full-inputs.tar.gz
+   tar -xzf main-group-cc_test-set-full-inputs.tar.gz --no-same-owner -C $G
+   ```
+
+   This gives `basic/` (BP86/def2-SVP Fock, overlap and polarizability),
+   `obs/` (coupled-cluster labels) and `obs_B3LYP/`, `obs_bp86/`,
+   `obs_DSD_PBEP86/` (DFT baselines and comparators) for the 959 test
+   molecules.
+2. Build the B3LYP model inputs:
+
+   ```bash
+   python scripts/build_basic_b3lyp.py $G      # -> $G/basic_B3LYP/
+   ```
+
+   The released model starts from B3LYP, so `config.ini` reads
+   `basic_B3LYP/` (`basic_subdir = basic_B3LYP`). The script assembles it
+   from `basic/` (geometry) and `obs_B3LYP/` (B3LYP Fock, overlap,
+   polarizability); no ORCA run is needed. **Do not point the model at
+   `basic/` or symlink `basic` to `basic_B3LYP`.** The BP86 inputs run
+   without error, and the energy still comes out right, but the gap,
+   multipoles, polarizability, charges and bond orders are wrong.
+   `test.py` checks the inputs against `obs_B3LYP/` and stops if they do
+   not match.
+
+   The loader caches preprocessed molecules in `$G/tmp_basic_b3lyp/` and
+   reuses them without re-reading `basic_B3LYP/`. If you ran `test.py` before
+   building `basic_B3LYP/` correctly, delete that directory first.
+3. Run:
 
    ```bash
    python models/HARP/test.py                      # -> models/HARP/output/test/test.json
@@ -90,6 +126,15 @@ curl -L -o models/HARP/output/model/1265_model.pt \
 `test.json` holds `pred` and `label` lists for each property over the test
 molecules, and `file_names` gives the molecule order. The config uses
 `device = cuda:0`. For CPU, set `[general] device = cpu`, which is much slower.
+
+The DFT columns of `compare_methods.py` use the observables shipped with the
+test set: BP86 and B3LYP at def2-SVP, DSD-PBEP86 at def2-TZVP. They are
+larger than the DFT columns of Table 1, where each functional was recomputed
+at the basis of the property's coupled-cluster reference (cc-pVTZ for energy,
+multipoles, charges and bond orders; cc-pVDZ for polarizability and gap).
+The model column is unaffected. `compare_methods.py` reports dipole and
+quadrupole errors per Cartesian component in a.u., whereas Table 1 reports
+|μ| in Debye and ‖Q‖.
 
 ## Inference on new geometries
 

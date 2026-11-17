@@ -132,12 +132,16 @@ if __name__ == "__main__":
     # basic_B3LYP Fock/overlap/alpha, not the default (BP86) `basic`. Without
     # this the model is fed the wrong baseline and every Hamiltonian-derived
     # property (gap, dipole, quadrupole, alpha, charges) comes out garbage.
+    # Build basic_B3LYP/ with scripts/build_basic_b3lyp.py (see README);
+    # check_basic_matches_baseline() below stops the run if this is wrong.
     loader.basic_subdir = config["general"].get("basic_subdir", "basic").strip()
     loader.tmp_subdir = config["general"].get("tmp_subdir", "tmp").strip()
     data, labels_all, obs_mats, charge_mats, fl = loader.load_data(
         test_datagroups, 0, 1,
         delta_learning=delta_learning, delta_baseline=delta_baseline,
         load_obs=(head_type == 'hamiltonian'))
+    if delta_learning:
+        loader.check_basic_matches_baseline(data, fl, delta_baseline)
     my_sampler = sampler(data, labels_all, device)
 
     n_molecules = len(my_sampler)
