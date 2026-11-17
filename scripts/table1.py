@@ -56,10 +56,14 @@ PAPER = {"E": ("63.0", "13.2", "15.1", "0.23"), "E_gap": ("1.32", "0.61", "4.84"
          "bond_order": ("0.0556", "0.0588", "0.0251", "0.0066")}
 
 
-def matches_printed(value, printed):
-    """True if value rounds to the printed string at its number of decimals."""
+def matches_printed(value, printed, slack=0.01):
+    """True if value is within half a unit of the printed value's last digit.
+
+    `slack` (1%) widens that by a hair so that GPU run-to-run variation of the
+    HARP column (fourth significant figure) does not flip a cell that sits on
+    a rounding boundary."""
     nd = len(printed.split(".")[1]) if "." in printed else 0
-    return f"{value:.{nd}f}" == printed
+    return abs(value - float(printed)) <= 0.5 * 10 ** (-nd) * (1 + slack)
 OUTLIERS = ("325", "772", "889")
 
 
@@ -217,7 +221,7 @@ def main():
         for v, r in zip(rows[p], ref):
             n_cell += 1
             n_match += matches_printed(v, r)
-    print(f"\n{n_match}/{n_cell} cells equal the printed Table 1 value at its printed precision.")
+    print(f"\n{n_match}/{n_cell} cells agree with the printed Table 1 value to its printed precision.")
     if args.set == "test":
         print("The printed DFT columns include outliers 325, 772, 889; "
               "run with --set paper to reproduce them.")

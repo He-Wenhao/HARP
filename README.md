@@ -165,7 +165,8 @@ python scripts/table1.py --model-dir models/HARP --set test   # all columns over
 | bond order | 0.0556 (0.0555) | 0.0588 | 0.0251 | 0.0066 |
 
 Printed values; in parentheses the 959-molecule value where it differs at the
-printed precision.
+printed precision. The HARP column can vary in the fourth significant figure
+between GPU runs.
 
 `compare_methods.py` compares against the DFT observables shipped with the
 test set instead (BP86 and B3LYP at def2-SVP, DSD-PBEP86 at def2-TZVP), with
